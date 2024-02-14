@@ -20,7 +20,7 @@
 // Col major
 __global__ void ffn_fuse_23(nv_bfloat16 *vec_sparse, nv_bfloat16 *vec_input,
                             nv_bfloat16 *mat_up, nv_bfloat16 *res, unsigned int mat_row, // 4096
-                            unsigned int mat_col)                          // 11008
+                            unsigned int mat_col, float threshold)                          // 11008
 {
     // mat_row = 4096;
     // mat_col = 11008;
@@ -42,7 +42,7 @@ __global__ void ffn_fuse_23(nv_bfloat16 *vec_sparse, nv_bfloat16 *vec_input,
 
     float sum = 0;
     nv_bfloat16 vec_sparse_val = *vec_sparse_p;
-    if (__bfloat162float(vec_sparse_val) <= 0.0f)
+    if (__bfloat162float(vec_sparse_val) <= threshold)
         ;
     else
     {
@@ -80,7 +80,7 @@ __global__ void ffn_fuse_23(nv_bfloat16 *vec_sparse, nv_bfloat16 *vec_input,
     if (threadIdx.x == 0)
     {
         float sum = warp_sum[threadIdx.y];
-        if (__bfloat162float(vec_sparse_val) > 0.0f){
+        if (__bfloat162float(vec_sparse_val) > threshold){
             sum = sum * __bfloat162float(vec_sparse_val);
         }
         *res_p = __float2bfloat16(sum);
@@ -89,7 +89,7 @@ __global__ void ffn_fuse_23(nv_bfloat16 *vec_sparse, nv_bfloat16 *vec_input,
 
 void launch_ffn_fuse_23(nv_bfloat16 *vec_sparse, nv_bfloat16 *vec_input,
                         nv_bfloat16 *mat_up, nv_bfloat16 *res, unsigned int mat_row, // 4096
-                        unsigned int mat_col)                          // 11008
+                        unsigned int mat_col, float threshold)                          // 11008
 {
     // mat_row = 4096;
     // mat_col = 11008;
@@ -102,7 +102,7 @@ void launch_ffn_fuse_23(nv_bfloat16 *vec_sparse, nv_bfloat16 *vec_input,
 
     // cudaEventRecord(start);
     ffn_fuse_23<<<grid_dim, block_dim>>>(vec_sparse, vec_input, mat_up, res,
-                                   mat_row, mat_col); // 4096; 11008
+                                   mat_row, mat_col, threshold); // 4096; 11008
     // cudaEventRecord(stop);
 
     // cudaEventSynchronize(stop);

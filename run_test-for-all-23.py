@@ -32,8 +32,9 @@ def compare_tensors(res_cuda, res_torch, tolerance):
         if (abs(a - b) > tolerance):
             print(f"Index {index}: diff = {a-b}")
 
-mat_row = 4096;
-mat_col = 11008;
+mat_row = 4096
+mat_col = 11008
+threshold = 0.
 
 file_path = 'pytorch/sparse_vec.npy'
 data = np.load(file_path)
@@ -56,7 +57,7 @@ def run_torch():
     return res
 
 def run_cuda():
-    ffn_23.torch_launch_ffn_fuse_23(vec_sparse, vec, mat, cuda_res, mat_row, mat_col)
+    ffn_23.torch_launch_ffn_fuse_23(vec_sparse, vec, mat, cuda_res, mat_row, mat_col, threshold)
     return cuda_res
 
 
