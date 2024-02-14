@@ -1,0 +1,10 @@
+.vscode
+nsys-reps/
+nsys-reps/*
+*.sqlite
+*.nsys-rep
+**/build/
+**/build/*
+**/dist/
+**/dist/*
+**/*.egg-info/
