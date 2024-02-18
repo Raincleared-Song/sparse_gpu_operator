@@ -15,7 +15,7 @@
 // #define checkCudaErrors(val) check((val), #val, __FILE__, __LINE__)
 
 // Row Major
-// (32, 32, 1) (11008/32)
+// (32, 32, 1) (mat_row / 32)
 __global__ void ffn_4(nv_bfloat16 *mat, nv_bfloat16 *vec, nv_bfloat16 *res,
                       unsigned int mat_row, unsigned int mat_col)
 {
@@ -41,7 +41,7 @@ __global__ void ffn_4(nv_bfloat16 *mat, nv_bfloat16 *vec, nv_bfloat16 *res,
         if (__bfloat162float(vec_val) == 0.0f)
             continue;
         else
-            //   mat_val = mat_p[iter*4096];
+            // mat_val = mat_p[iter*4096];
             mat_val = mat_p[iter * mat_col];
         sum += __bfloat162float(vec_val) * __bfloat162float(mat_val);
         // sum = __hfma(vec_val, mat_val, sum);

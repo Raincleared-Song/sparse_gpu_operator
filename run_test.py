@@ -32,8 +32,8 @@ def compare_tensors(res_cuda, res_torch, tolerance):
         if (abs(a - b) > tolerance):
             print(f"Index {index}: diff = {a-b}")
 
-mat_row = 11008;
-mat_col = 4096;
+mat_row = 11008
+mat_col = 4096
 
 # mat_row = 256;
 # mat_col = 512;

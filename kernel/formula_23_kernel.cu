@@ -19,12 +19,9 @@
 
 // Col major
 __global__ void ffn_fuse_23(nv_bfloat16 *vec_sparse, nv_bfloat16 *vec_input,
-                            nv_bfloat16 *mat_up, nv_bfloat16 *res, unsigned int mat_row, // 4096
-                            unsigned int mat_col, float threshold)                          // 11008
+                            nv_bfloat16 *mat_up, nv_bfloat16 *res, unsigned int mat_row,
+                            unsigned int mat_col, float threshold)
 {
-    // mat_row = 4096;
-    // mat_col = 11008;
-
     int col_id = blockIdx.y * 32 + threadIdx.y;
     int num_per_threadx = mat_row / 32;
     int row_chunk_id = threadIdx.x;
@@ -88,12 +85,9 @@ __global__ void ffn_fuse_23(nv_bfloat16 *vec_sparse, nv_bfloat16 *vec_input,
 }
 
 void launch_ffn_fuse_23(nv_bfloat16 *vec_sparse, nv_bfloat16 *vec_input,
-                        nv_bfloat16 *mat_up, nv_bfloat16 *res, unsigned int mat_row, // 4096
-                        unsigned int mat_col, float threshold)                          // 11008
+                        nv_bfloat16 *mat_up, nv_bfloat16 *res, unsigned int mat_row,
+                        unsigned int mat_col, float threshold)
 {
-    // mat_row = 4096;
-    // mat_col = 11008;
-
     dim3 grid_dim(1, mat_col / 32);
     dim3 block_dim(32, 32, 1);
     // cudaEvent_t start, stop;
@@ -102,7 +96,7 @@ void launch_ffn_fuse_23(nv_bfloat16 *vec_sparse, nv_bfloat16 *vec_input,
 
     // cudaEventRecord(start);
     ffn_fuse_23<<<grid_dim, block_dim>>>(vec_sparse, vec_input, mat_up, res,
-                                   mat_row, mat_col, threshold); // 4096; 11008
+                                   mat_row, mat_col, threshold);
     // cudaEventRecord(stop);
 
     // cudaEventSynchronize(stop);
