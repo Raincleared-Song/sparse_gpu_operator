@@ -35,6 +35,7 @@ def compare_tensors(res_cuda, res_torch, tolerance):
 
 mat_row = 4096
 mat_col = 11008
+fatrelu_threshold = 0.
 
 # file_path = 'pytorch/sparse_vec.npy'
 # data = np.load(file_path)
@@ -56,7 +57,7 @@ for idx in range(10):
         return res
 
     def run_cuda():
-        ffn_23.torch_launch_ffn_fuse_23(vec_sparse, vec, mat, cuda_res, mat_row, mat_col)
+        ffn_23.torch_launch_ffn_fuse_23(vec_sparse, vec, mat, cuda_res, mat_row, mat_col, fatrelu_threshold)
         return cuda_res
 
     # 使用大量计算清空 GPU 缓存
