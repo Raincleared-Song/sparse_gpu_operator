@@ -10,18 +10,18 @@ Therefore, to achieve acceleration without inference inaccuracies and test the p
 
 ### Methodology
 
-Given the hidden dimension $d_{model}$ and the FFN intermediate dimension $d_{ff}$, the computation process of a gated FFN can be formalized as:
+Given the hidden dimension $`d_{model}`$ and the FFN intermediate dimension $`d_{ff}`$, the computation process of a gated FFN can be formalized as:
 ```math
 \mathbf{s} = \sigma(\mathbf{x} \mathbf{W}_s^T), \quad \mathbf{x}_1 = \mathbf{s} \odot (\mathbf{x} \mathbf{W}_1^T),\quad
     \text{FFN}(\mathbf{x}) = \mathbf{x}_1  \mathbf{W}_2^T,
 ```
-where $\mathbf{x}\in\mathbb{R}^{d_{model}}$, $\mathbf{s}, \mathbf{x}\_1\in\mathbb{R}^{d\_{ff}}$, $\sigma$, and $\odot$ denote the input hidden states, the gating scores, the intermediate outputs, the activation function, and the element-wise multiplication respectively. $\mathbf{W}\_s,\mathbf{W}\_1\in\mathbb{R}^{d\_{ff} \times d\_{model}}$ and $\mathbf{W}\_2\in\mathbb{R}^{d\_{model} \times d\_{ff}}$ are learnable weights.
+where $`\mathbf{x}\in\mathbb{R}^{d_{model}}`$, $`\mathbf{s}, \mathbf{x}_1\in\mathbb{R}^{d_{ff}}`$, $`\sigma`$, and $`\odot`$ denote the input hidden states, the gating scores, the intermediate outputs, the activation function, and the element-wise multiplication respectively. $`\mathbf{W}_s,\mathbf{W}_1\in\mathbb{R}^{d_{ff} \times d_{model}}`$ and $`\mathbf{W}_2\in\mathbb{R}^{d_{model} \times d_{ff}}`$ are learnable weights.
 
 We reorganize a ReLU-activated gated FFN into three major steps and our two operators, called **Operator Step (2)** `ffn_23` and **Operator Step (3)** `ffn_4`, are responsible for the step (2) and (3) respectively:
 
-(1) A dense matrix-vector multiplication operator $\mathbf{x} \mathbf{W}\_s\^T$ which can be directly supported by vendor libraries such as cuBLAS;
-(2) A fused operator of ReLU and $\mathbf{s} \odot (\mathbf{x} \mathbf{W}\_1^T)$ with output-side sparsity;
-(3) A sparse matrix-vector multiplication operator $\mathbf{x}\_1 \mathbf{W}\_2^T$ with input-side sparsity.
+(1) A dense matrix-vector multiplication operator $`\mathbf{x} \mathbf{W}_s^T`$ which can be directly supported by vendor libraries such as cuBLAS;
+(2) A fused operator of ReLU and $`\mathbf{s} \odot (\mathbf{x} \mathbf{W}_1^T)`$ with output-side sparsity;
+(3) A sparse matrix-vector multiplication operator $`\mathbf{x}_1 \mathbf{W}_2^T`$ with input-side sparsity.
 
 Codes for Operator Step (2) and Operator Step (3) are included in `kernel/formula_23_kernel.cu` and `kernel/formula_4_kernel.cu` respectively. For more implementation details, refer to Appendix C of [paper](TODO).
 
@@ -29,16 +29,16 @@ Codes for Operator Step (2) and Operator Step (3) are included in `kernel/formul
 
 To test the practical acceleration effects of ReLU-activated LLMs with the above operators applied, we measure the average single-step wall-clock time spent by our two sparse GPU operators, which are responsible for step (2) and step (3) respectively. Major results are shown as follows, refer to Section 4.3 of [paper](TODO) for more details.
 
-|           Setting           | Average<br>Sparsity | Speed (2)<br>Time | Speed (2)<br>Speedup | Speed (3)<br>Time | Speed (3)<br>Speedup |
-|:---------------------------:|:-------------------:|:-------------:|:----------------:|:-------------:|:----------------:|
-|        ReluLLaMA-7B         |        66.98        |     67.12     |       1.35       |     63.00     |       1.32       |
-|       Vanilla ReLU-7B       |        66.04        |     67.85     |       1.33       |     63.28     |       1.31       |
-|       Fixed $L_1$-7B        |        91.46        |     40.99     |       2.21       |     54.19     |       1.53       |
-|   **ProSparse-7B**$\^\*$    |        88.11        |     46.66     |       1.94       |     55.56     |       1.49       |
-|      **ProSparse-7B**       |        89.32        |     45.38     |       2.00       |     55.05     |       1.51       |
-|        ReluLLaMA-13B        |        71.56        |     69.92     |       1.88       |     75.47     |       1.51       |
-|   **ProSparse-13B**$\^\*$   |        87.97        |     55.29     |       2.38       |     67.50     |       1.68       |
-|      **ProSparse-13B**      |        88.80        |     53.78     |       2.44       |     66.73     |       1.70       |
+|          Setting          | Average<br>Sparsity | Speed (2)<br>Time | Speed (2)<br>Speedup | Speed (3)<br>Time | Speed (3)<br>Speedup |
+|:-------------------------:|:-------------------:|:-------------:|:----------------:|:-------------:|:----------------:|
+|       ReluLLaMA-7B        |        66.98        |     67.12     |       1.35       |     63.00     |       1.32       |
+|      Vanilla ReLU-7B      |        66.04        |     67.85     |       1.33       |     63.28     |       1.31       |
+|      Fixed $`L_1`$-7B       |        91.46        |     40.99     |       2.21       |     54.19     |       1.53       |
+|   **ProSparse-7B**$`^*`$    |        88.11        |     46.66     |       1.94       |     55.56     |       1.49       |
+|     **ProSparse-7B**      |        89.32        |     45.38     |       2.00       |     55.05     |       1.51       |
+|       ReluLLaMA-13B       |        71.56        |     69.92     |       1.88       |     75.47     |       1.51       |
+|   **ProSparse-13B**$`^*`$   |        87.97        |     55.29     |       2.38       |     67.50     |       1.68       |
+|     **ProSparse-13B**     |        88.80        |     53.78     |       2.44       |     66.73     |       1.70       |
 
 `Time` means the average wall-clock time (us) cost by each step with our sparse GPU operators, and `Speedup` is the speedup ratio to the setting without operators. The average time for step (2) and (3) without sparse GPU operators is about **90.55 and 82.92 (us) for 7B, 131.36 and 113.68 (us) for 13B** respectively under all sparsity.
 
@@ -68,7 +68,7 @@ Note that our Operator Step (2) supports FATReLU, a non-zero threshold ReLU vari
     0 \quad \mathrm{otherwise},
     \end{cases}
 ```
-where $T>0$ is a positive threshold. Remember to specify $T$ as the last parameter of a call to `ffn_23`, use 0 for vanilla ReLU.
+where $`T>0`$ is a positive threshold. Remember to specify $`T`$ as the last parameter of a call to `ffn_23`, use 0 for vanilla ReLU.
 
 ### Attention: Data Types
 
