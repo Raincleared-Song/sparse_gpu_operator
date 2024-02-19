@@ -27,7 +27,7 @@ Codes for Operator Step (2) and Operator Step (3) are included in `kernel/formul
 
 ### Results
 
-To test the practical acceleration effects of ReLU-activated LLMs with the above operators applied, we measure the average single-step wall-clock time spent by our two sparse GPU operators, which are responsible for step (2) and step (3) respectively. Major results are shown as follows, refer to Section 4.3 of [paper](TODO) for more details.
+To test the practical acceleration effects of ReLU-activated LLMs with the above operators applied, we measure the average single-step wall-clock time spent by our two sparse GPU operators, which are responsible for step (2) and step (3) respectively. Major results are shown as follows, refer to Section 4.3 of [paper](TODO) for more details. The ProSparse LLaMA2 models, which have ReLU-based high activation sparsity and comparable performance to original Swish-activated LLaMA2 versions, are available at the following links: [7B](https://huggingface.co/SparseLLM/prosparse-llama-2-7b) and [13B](https://huggingface.co/SparseLLM/prosparse-llama-2-13b).
 
 |          Setting          | Average<br>Sparsity | Speed (2)<br>Time | Speed (2)<br>Speedup | Speed (3)<br>Time | Speed (3)<br>Speedup |
 |:-------------------------:|:-------------------:|:-------------:|:----------------:|:-------------:|:----------------:|
