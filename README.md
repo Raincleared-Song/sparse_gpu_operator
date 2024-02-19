@@ -4,7 +4,7 @@ This is the source codes for our two sparse GPU operators mentioned in paper *Pr
 
 ### Background
 
-The utilization of activation sparsity, namely the existence of considerable weakly-contributed elements among activation outputs, is a promising method for inference acceleration of large language models (LLMs). Concretely, acceleration methods based on activation sparsity usually achieves higher inference speed by making wiser resource allocation and computation policies to avoid resource waste on these weakly-contributed parameters. However, existing acceleration frameworks are mostly approximate algorithms, which risk potential inference inaccuracies caused by invalid predictions made by activation predictors (e.g., [Deja Vu](https://proceedings.mlr.press/v202/liu23am/liu23am.pdf) and [PowerInfer](https://arxiv.org/pdf/2312.12456.pdf)).
+The utilization of activation sparsity, namely the existence of considerable weakly-contributed elements among activation outputs, is a promising method for inference acceleration of large language models (LLMs). Concretely, acceleration methods based on activation sparsity usually achieve higher inference speed by making wiser resource allocation and computation policies to avoid resource waste on these weakly-contributed parameters. However, existing acceleration frameworks are mostly approximate algorithms, which risk potential inference inaccuracies caused by invalid predictions made by activation predictors (e.g., [Deja Vu](https://proceedings.mlr.press/v202/liu23am/liu23am.pdf) and [PowerInfer](https://arxiv.org/pdf/2312.12456.pdf)).
 
 Therefore, to achieve acceleration without inference inaccuracies and test the practical speedup effects of ReLU-activated LLMs with higher sparsity, we implement two hardware-efficient sparse GPU operators with system-level optimizations, such as operator fusion, coalesced memory access, and vectorization, thereby exploiting input-side and output-side sparsity.
 
@@ -29,16 +29,16 @@ Codes for Operator Step (2) and Operator Step (3) are included in `kernel/formul
 
 To test the practical acceleration effects of ReLU-activated LLMs with the above operators applied, we measure the average single-step wall-clock time spent by our two sparse GPU operators, which are responsible for step (2) and step (3) respectively. Major results are shown as follows, refer to Section 4.3 of [paper](TODO) for more details. The ProSparse LLaMA2 models, which have ReLU-based high activation sparsity and comparable performance to original Swish-activated LLaMA2 versions, are available at the following links: [7B](https://huggingface.co/SparseLLM/prosparse-llama-2-7b) and [13B](https://huggingface.co/SparseLLM/prosparse-llama-2-13b).
 
-|          Setting          | Average<br>Sparsity | Speed (2)<br>Time | Speed (2)<br>Speedup | Speed (3)<br>Time | Speed (3)<br>Speedup |
-|:-------------------------:|:-------------------:|:-------------:|:----------------:|:-------------:|:----------------:|
-|       ReluLLaMA-7B        |        66.98        |     67.12     |       1.35       |     63.00     |       1.32       |
-|      Vanilla ReLU-7B      |        66.04        |     67.85     |       1.33       |     63.28     |       1.31       |
-|      Fixed $`L_1`$-7B       |        91.46        |     40.99     |       2.21       |     54.19     |       1.53       |
-|   **ProSparse-7B**$`^*`$    |        88.11        |     46.66     |       1.94       |     55.56     |       1.49       |
-|     **ProSparse-7B**      |        89.32        |     45.38     |       2.00       |     55.05     |       1.51       |
-|       ReluLLaMA-13B       |        71.56        |     69.92     |       1.88       |     75.47     |       1.51       |
-|   **ProSparse-13B**$`^*`$   |        87.97        |     55.29     |       2.38       |     67.50     |       1.68       |
-|     **ProSparse-13B**     |        88.80        |     53.78     |       2.44       |     66.73     |       1.70       |
+|          Setting          | Average<br>Sparsity | Step (2)<br>Time | Step (2)<br>Speedup | Step (3)<br>Time | Step (3)<br>Speedup |
+|:-------------------------:|:-------------------:|:----------------:|:-------------------:|:----------------:|:----------------:|
+|       ReluLLaMA-7B        |        66.98        |      67.12       |        1.35         |      63.00       |       1.32       |
+|      Vanilla ReLU-7B      |        66.04        |      67.85       |        1.33         |      63.28       |       1.31       |
+|      Fixed $`L_1`$-7B       |        91.46        |      40.99       |        2.21         |      54.19       |       1.53       |
+|   **ProSparse-7B**$`^*`$    |        88.11        |      46.66       |        1.94         |      55.56       |       1.49       |
+|     **ProSparse-7B**      |        89.32        |      45.38       |        2.00         |      55.05       |       1.51       |
+|       ReluLLaMA-13B       |        71.56        |      69.92       |        1.88         |      75.47       |       1.51       |
+|   **ProSparse-13B**$`^*`$   |        87.97        |      55.29       |        2.38         |      67.50       |       1.68       |
+|     **ProSparse-13B**     |        88.80        |      53.78       |        2.44         |      66.73       |       1.70       |
 
 `Time` means the average wall-clock time (us) cost by each step with our sparse GPU operators, and `Speedup` is the speedup ratio to the setting without operators. The average time for step (2) and (3) without sparse GPU operators is about **90.55 and 82.92 (us) for 7B, 131.36 and 113.68 (us) for 13B** respectively under all sparsity.
 
