@@ -1,6 +1,6 @@
 # Efficient GPU Operators for ReLU-Activated LLMs
 
-This is the source codes for our two sparse GPU operators mentioned in paper *ProSparse: Introducing and Enhancing Intrinsic Activation Sparsity within Large Language Models* ([link](TODO)), tailored for the ReLU-activated FFNs in LLM.
+This is the source codes for our two sparse GPU operators mentioned in paper *ProSparse: Introducing and Enhancing Intrinsic Activation Sparsity within Large Language Models* ([link](https://arxiv.org/pdf/2402.13516.pdf)), tailored for the ReLU-activated FFNs in LLM.
 
 ### Background
 
@@ -23,11 +23,11 @@ We reorganize a ReLU-activated gated FFN into three major steps and our two oper
 (2) A fused operator of ReLU and $`\mathbf{s} \odot (\mathbf{x} \mathbf{W}_1^T)`$ with output-side sparsity;
 (3) A sparse matrix-vector multiplication operator $`\mathbf{x}_1 \mathbf{W}_2^T`$ with input-side sparsity.
 
-Codes for Operator Step (2) and Operator Step (3) are included in `kernel/formula_23_kernel.cu` and `kernel/formula_4_kernel.cu` respectively. For more implementation details, refer to Appendix C of [paper](TODO).
+Codes for Operator Step (2) and Operator Step (3) are included in `kernel/formula_23_kernel.cu` and `kernel/formula_4_kernel.cu` respectively. For more implementation details, refer to Appendix C of [paper](https://arxiv.org/pdf/2402.13516.pdf).
 
 ### Results
 
-To test the practical acceleration effects of ReLU-activated LLMs with the above operators applied, we measure the average single-step wall-clock time spent by our two sparse GPU operators, which are responsible for step (2) and step (3) respectively. Major results are shown as follows, refer to Section 4.3 of [paper](TODO) for more details. The ProSparse LLaMA2 models, which have ReLU-based high activation sparsity and comparable performance to original Swish-activated LLaMA2 versions, are available at the following links: [7B](https://huggingface.co/SparseLLM/prosparse-llama-2-7b) and [13B](https://huggingface.co/SparseLLM/prosparse-llama-2-13b).
+To test the practical acceleration effects of ReLU-activated LLMs with the above operators applied, we measure the average single-step wall-clock time spent by our two sparse GPU operators, which are responsible for step (2) and step (3) respectively. Major results are shown as follows, refer to Section 4.3 of [paper](https://arxiv.org/pdf/2402.13516.pdf) for more details. The ProSparse LLaMA2 models, which have ReLU-based high activation sparsity and comparable performance to original Swish-activated LLaMA2 versions, are available at the following links: [7B](https://huggingface.co/SparseLLM/prosparse-llama-2-7b) and [13B](https://huggingface.co/SparseLLM/prosparse-llama-2-13b).
 
 |          Setting          | Average<br>Sparsity | Step (2)<br>Time | Step (2)<br>Speedup | Step (3)<br>Time | Step (3)<br>Speedup |
 |:-------------------------:|:-------------------:|:----------------:|:-------------------:|:----------------:|:----------------:|
@@ -111,5 +111,7 @@ Please kindly cite using the following BibTeX:
   title={{ProSparse}: Introducing and Enhancing Intrinsic Activation Sparsity within Large Language Models},
   author={Song, Chenyang and Han, Xu and Zhang, Zhengyan and Hu, Shengding and Shi, Xiyu and Li, Kuai and Chen, Chen and Liu, Zhiyuan and Li, Guangli and Yang, Tao and Sun, Maosong},
   year={2024},
+  journal={arXiv preprint arXiv:2402.13516},
+  url={https://arxiv.org/pdf/2402.13516.pdf}
 }
 ```
