@@ -55,6 +55,7 @@ void launch_ffn_4(nv_bfloat16 *mat, nv_bfloat16 *vec, nv_bfloat16 *res,
                   unsigned int mat_row, unsigned int mat_col)
 {
 #ifdef USE_CONSTANT
+    mat_row = ROW_OPT;
     mat_col = COL_OPT;
 #endif
 
