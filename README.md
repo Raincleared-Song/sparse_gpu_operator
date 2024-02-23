@@ -76,31 +76,25 @@ The default data type used in these codes is **bfloat16**. Nevertheless, other d
 
 ### Attention: Dimensions
 
-We found significant performance improvement if the dimensions are pre-defined as fixed values in Operator Step (3). The default dimensions are fixed to the settings of LLaMA-7B. If other dimensions (e.g., LLaMA-13B) have to be supported, just make the following modification in `kernel/formula_4_kernel.cu`.
+We found significant performance improvement if the dimensions are pre-defined as fixed values in Operator Step (3). The default dimensions are fixed to the settings of LLaMA-7B. If other dimensions (e.g., LLaMA-13B) have to be supported, just edit the macro variables in `kernel/formula_4_kernel.cu`.
 
 ```c++
 // Default setting for LLaMA-7B
-__global__ void ffn_4(nv_bfloat16 *mat, nv_bfloat16 *vec, nv_bfloat16 *res,
-                      unsigned int mat_row, unsigned int mat_col)
-{
-    mat_row = 11008;
-    mat_col = 4096;
+......
+#define ROW_OPT 11008
+#define COL_OPT 4096
+......
 
-    float sum = 0;
-    ......
-}
 
 // Example: change to the setting of LLaMA-13B
-__global__ void ffn_4(nv_bfloat16 *mat, nv_bfloat16 *vec, nv_bfloat16 *res,
-                      unsigned int mat_row, unsigned int mat_col)
-{
-    mat_row = 13824;
-    mat_col = 5120;
+......
+#define ROW_OPT 13824
+#define COL_OPT 5120
+......
 
-    float sum = 0;
-    ......
-}
 ```
+
+If one want to treat dimensions as variables, i.e. undefine the macros, please remove the `define_macros=[('USE_CONSTANT', None)],` line in the `setup.py` file.
 
 ### Citation
 

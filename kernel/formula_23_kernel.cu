@@ -5,18 +5,6 @@
 #include <stdio.h>
 #include <cstdint>
 
-
-// void check(cudaError_t result, char const* const func, const char* const file,
-//            int const line) {
-//   if (result) {
-//     fprintf(stderr, "CUDA error = %s at %s:%d '%s'\n",
-//             cudaGetErrorString(result), file, line, func);
-//     exit(1);
-//   }
-// }
-// #define checkCudaErrors(val) check((val), #val, __FILE__, __LINE__)
-
-
 // Col major
 __global__ void ffn_fuse_23(nv_bfloat16 *vec_sparse, nv_bfloat16 *vec_input,
                             nv_bfloat16 *mat_up, nv_bfloat16 *res, unsigned int mat_row,
@@ -90,18 +78,8 @@ void launch_ffn_fuse_23(nv_bfloat16 *vec_sparse, nv_bfloat16 *vec_input,
 {
     dim3 grid_dim(1, mat_col / 32);
     dim3 block_dim(32, 32, 1);
-    // cudaEvent_t start, stop;
-    // cudaEventCreate(&start);
-    // cudaEventCreate(&stop);
 
-    // cudaEventRecord(start);
     ffn_fuse_23<<<grid_dim, block_dim>>>(vec_sparse, vec_input, mat_up, res,
                                    mat_row, mat_col, threshold);
-    // cudaEventRecord(stop);
 
-    // cudaEventSynchronize(stop);
-    // *milliseconds = 0;
-    // cudaEventElapsedTime(milliseconds, start, stop);
-
-    // checkCudaErrors(cudaPeekAtLastError());
 }
