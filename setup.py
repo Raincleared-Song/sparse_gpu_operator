@@ -8,7 +8,8 @@ setup(
         CUDAExtension(
             "ffn_4",
             ["pytorch/formula_4.cpp", "kernel/formula_4_kernel.cu"],
-        )
+            define_macros=[('USE_CONSTANT', None)],
+        ),
     ],
     cmdclass={
         "build_ext": BuildExtension

@@ -4,11 +4,19 @@
 #include <stdio.h>
 #include <cstdint>
 
+#define ROW_OPT 11008
+#define COL_OPT 4096
+
 // Row Major
 // (32, 32, 1) (mat_row / 32)
 __global__ void ffn_4(nv_bfloat16 *mat, nv_bfloat16 *vec, nv_bfloat16 *res,
                       unsigned int mat_row, unsigned int mat_col)
 {
+
+#ifdef USE_CONSTANT
+    mat_row = ROW_OPT;
+    mat_col = COL_OPT;
+#endif
 
     float sum = 0;
     // nv_bfloat16 sum = __float2bfloat16(0.0f);
@@ -46,12 +54,12 @@ __global__ void ffn_4(nv_bfloat16 *mat, nv_bfloat16 *vec, nv_bfloat16 *res,
 void launch_ffn_4(nv_bfloat16 *mat, nv_bfloat16 *vec, nv_bfloat16 *res,
                   unsigned int mat_row, unsigned int mat_col)
 {
-    mat_row = 11008;
-    mat_col = 4096;
+#ifdef USE_CONSTANT
+    mat_col = COL_OPT;
+#endif
 
     dim3 grid_dim(1, mat_col / 32);
     dim3 block_dim(32, 32, 1);
 
     ffn_4<<<grid_dim, block_dim>>>(mat, vec, res, mat_row, mat_col);
-
 }
