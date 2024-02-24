@@ -8,3 +8,4 @@ nsys-reps/*
 **/dist/
 **/dist/*
 **/*.egg-info/
+.idea/
