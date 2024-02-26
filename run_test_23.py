@@ -3,8 +3,8 @@ import numpy as np
 import torch
 import ffn_23
 
-nwarmup = 0
-ntest = 1
+nwarmup = 10
+ntest = 100
 
 def show_time(func):
     times = list()
@@ -16,7 +16,7 @@ def show_time(func):
         # sync the threads to get accurate cuda running time
         torch.cuda.synchronize(device="cuda:0")
         start_time = time.time()
-        func()
+        res = func()
         torch.cuda.synchronize(device="cuda:0")
         end_time = time.time()
         times.append((end_time-start_time) * 1e6)
@@ -30,8 +30,10 @@ def compare_tensors(res_cuda, res_torch, tolerance):
     res_torch_list = res_torch.tolist()
 
     for index, (a, b) in enumerate(zip(res_cuda_list, res_torch_list)):
-        if (abs(a - b) > tolerance):
+        if (abs(b) == 0 and abs(a) > tolerance or abs(b) > 0 and abs(a - b) / abs(b) > tolerance):
             print(f"Index {index}: diff = {a-b}")
+            return False
+    return True
 
 mat_row = 4096
 mat_col = 11008
@@ -81,8 +83,10 @@ for idx in range(10):
         z = x @ y
     print("Running cuda...")
     cuda_time, cuda_res = show_time(run_cuda)
-    assert len(cuda_time) == 1
     print("Cuda time:  {:.4f} us".format(np.mean(cuda_time)))
 
-    # tolerance = 0
-    # compare_tensors(cuda_res, torch_res, tolerance)
+    tolerance = 0.01
+    if not compare_tensors(cuda_res, torch_res, tolerance):
+        from IPython import embed
+        embed()
+        exit()
