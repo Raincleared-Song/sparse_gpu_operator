@@ -23,6 +23,7 @@ setup(
         CUDAExtension(
             "ffn_23",
             ["pytorch/formula_23.cpp", "kernel/formula_23_kernel.cu"],
+            define_macros=[('USE_CONSTANT', None)],
         )
     ],
     cmdclass={
