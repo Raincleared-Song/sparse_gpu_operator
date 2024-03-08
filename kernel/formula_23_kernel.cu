@@ -28,7 +28,12 @@ __global__ void ffn_fuse_23(nv_bfloat16 *vec_sparse, nv_bfloat16 *vec_input,
     float sum = 0;
     nv_bfloat16 vec_sparse_val = *vec_sparse_p;
     if (__bfloat162float(vec_sparse_val) <= threshold)
-        ;
+    {
+        if (threadIdx.x == 0)
+        {
+            *res_p = __float2bfloat16(0.f);
+        }
+    }
     else
     {
 #pragma unroll
@@ -55,20 +60,18 @@ __global__ void ffn_fuse_23(nv_bfloat16 *vec_sparse, nv_bfloat16 *vec_input,
             sum += __bfloat162float(vec_input_h4->x) * __bfloat162float(mat_up_h4->x);
             sum += __bfloat162float(vec_input_h4->y) * __bfloat162float(mat_up_h4->y);
         }
-    }
+        sum += __shfl_down_sync(0xffffffff, sum, 16);
+        sum += __shfl_down_sync(0xffffffff, sum, 8);
+        sum += __shfl_down_sync(0xffffffff, sum, 4);
+        sum += __shfl_down_sync(0xffffffff, sum, 2);
+        sum += __shfl_down_sync(0xffffffff, sum, 1);
 
-    __shared__ float warp_sum[32];
-    warp_sum[threadIdx.y] = 0.0f;
-    atomicAdd(&warp_sum[threadIdx.y], sum);
-    __syncthreads();
-
-    if (threadIdx.x == 0)
-    {
-        float sum = warp_sum[threadIdx.y];
-        if (__bfloat162float(vec_sparse_val) > threshold){
-            sum = sum * __bfloat162float(vec_sparse_val);
+        if (threadIdx.x == 0)
+        {
+            float sum_res = sum;
+            sum_res = sum_res * __bfloat162float(vec_sparse_val);
+            *res_p = __float2bfloat16(sum_res);
         }
-        *res_p = __float2bfloat16(sum);
     }
 }
 
@@ -80,6 +83,5 @@ void launch_ffn_fuse_23(nv_bfloat16 *vec_sparse, nv_bfloat16 *vec_input,
     dim3 block_dim(32, 32, 1);
 
     ffn_fuse_23<<<grid_dim, block_dim>>>(vec_sparse, vec_input, mat_up, res,
-                                   mat_row, mat_col, threshold);
-
+                                         mat_row, mat_col, threshold);
 }
