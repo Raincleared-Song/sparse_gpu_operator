@@ -59,7 +59,7 @@ for idx in range(10):
         return res
 
     def run_cuda():
-        ffn_23.torch_launch_ffn_fuse_23(vec_sparse, vec, mat, cuda_res, mat_row, mat_col, fatrelu_threshold)
+        ffn_23.torch_launch_ffn_fuse_23(vec_sparse, vec, mat, cuda_res, 1, mat_row, mat_col, fatrelu_threshold)
         return cuda_res
 
     # 使用大量计算清空 GPU 缓存
